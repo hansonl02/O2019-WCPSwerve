@@ -46,9 +46,6 @@ public class Swerve extends Subsystem{
 	public SwerveDriveModule frontRight, frontLeft, rearLeft, rearRight;
 	List<SwerveDriveModule> modules;
 	List<SwerveDriveModule> positionModules;
-
-	//Dat elevator
-	Elevator elevator;
 	
 	//Evade maneuver variables
 	Translation2d clockwiseCenter = new Translation2d();
@@ -195,8 +192,6 @@ public class Swerve extends Subsystem{
 		robotState = RobotState.getInstance();
 
 		generator = TrajectoryGenerator.getInstance();
-
-		elevator = Elevator.getInstance();
 	}
 
 	//Assigns appropriate directions for scrub factors
@@ -642,7 +637,7 @@ public class Swerve extends Subsystem{
 						visionUpdateRequested = true;
 						System.out.println("Vision delayed until next cycle");
 					}else{
-						visionUpdatesAllowed = elevator.inVisionRange(robotHasDisk ? Constants.kElevatorDiskVisibleRanges : Constants.kElevatorBallVisibleRanges);
+						visionUpdatesAllowed = true;
 						if(vState == VisionState.CURVED)
 							setCurvedVisionTrajectory(aim.get().getRange() * 0.5, aim, endTranslation, override);
 						else
@@ -671,7 +666,7 @@ public class Swerve extends Subsystem{
 						initialVisionDistance = aim.get().getRange();
 						latestAim = aim.get();
 					}
-					visionUpdatesAllowed = elevator.inVisionRange(robotHasDisk ? Constants.kElevatorDiskVisibleRanges : Constants.kElevatorBallVisibleRanges);
+					visionUpdatesAllowed = true;
 					if(vState == VisionState.CURVED)
 						setCurvedVisionTrajectory(aim.get().getRange() * 0.5, aim, endTranslation, false);
 					else
@@ -912,7 +907,7 @@ public class Swerve extends Subsystem{
 			break;
 		case VISION:
 			if(!motionPlanner.isDone()){
-				visionUpdatesAllowed = elevator.inVisionRange(robotHasDisk ? Constants.kElevatorDiskVisibleRanges : Constants.kElevatorBallVisibleRanges);
+				visionUpdatesAllowed = true;
 				Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
 				if(aim.isPresent() && visionUpdatesAllowed && firstVisionCyclePassed){
 					visionVisibleCycles++;

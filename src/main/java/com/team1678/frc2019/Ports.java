@@ -15,8 +15,6 @@ public class Ports {
     public static final int ELEVATOR_2 = 13;
 
     public static final int BALL_INTAKE = 6;
-    public static final int BALL_FEEDER = 9;
-
     public static final int BALL_CARRIAGE = 10;
 
     public static final int DISK_SCORER = 14;
@@ -38,6 +36,8 @@ public class Ports {
 
     public static final int DISK_INTAKE_EXTEND = 1;
     public static final int DISK_INTAKE_RELEASE = 2;
+
+    public static final int BALL_INTAKE_EXTEND = 3;
     
     //Digital Inputs
     public static final int BALL_INTAKE_BANNER  = 3;

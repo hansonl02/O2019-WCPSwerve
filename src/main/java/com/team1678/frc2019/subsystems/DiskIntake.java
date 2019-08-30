@@ -69,7 +69,7 @@ public class DiskIntake extends Subsystem {
     pumpMotor.configForwardSoftLimitEnable(false);
     pumpMotor.configReverseSoftLimitEnable(false);
 
-    setCurrentLimit(Constants.kJackCurrentLimit);
+    setCurrentLimit(20);
   }
 
   public void setCurrentLimit(int amps) {
@@ -136,6 +136,10 @@ public class DiskIntake extends Subsystem {
     extend.set(fire);
   }
 
+  public boolean isExtended() {
+    return currentState.extended;
+  }
+
   public void fireRelease(boolean fire) {
     release.set(!fire);
   }
@@ -144,15 +148,6 @@ public class DiskIntake extends Subsystem {
     setRampRate(0.0);
     pumpMotor.set(ControlMode.PercentOutput, power);
   }
-
-  private void buildPressure() {
-    setPump(Constants.kPumpBuildOutput);
-  }
-
-  private void holdPressure() {
-    setPump(Constants.kPumpHoldOutput)
-  }
-
   private final Loop loop = new Loop() {
 
     @Override
@@ -188,26 +183,13 @@ public class DiskIntake extends Subsystem {
           break;
         case SCORING:
           if(stateChanged) {
-            //setRampRate(0.0);
             hasDisk = false;
           }
           if (timestamp - stateEnteredTimestamp > 2.0) {
             stop();
-            //setRampRate(Constants.kDiskIntakeRampRate);
           }
           break;
         case HOLDING:
-          /*if(banner.get()) {
-            if(isResucking) {
-              holdRollers();
-              isResucking = false;
-            }
-          } else {
-            if (!isResucking) {
-              setRollers(Constants.kDiskIntakingResuckingOutput);
-              isResucking = true;
-            }
-          }*/
           break;
         default:
           break;

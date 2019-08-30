@@ -172,4 +172,6 @@ public class Constants {
 
 	//LED Arrays
 	public static final List<List<Double>> rainbow = Arrays.asList(red, orange, yellow, green, blue, pink, purple);
+
+	public static final int kLongCANTimeoutMs = 100;
 }
