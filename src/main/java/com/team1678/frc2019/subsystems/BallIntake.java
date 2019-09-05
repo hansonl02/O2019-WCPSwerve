@@ -17,6 +17,7 @@ public class BallIntake extends Subsystem {
     // Intaking is positive
     public static double kIntakeVoltage = -12.0;
     public static double kHoldingVoltage = 0;
+    public static double kCarriageVoltage = 6.0;
     public static double kOuttakeVoltage = 10.0;
 
     private boolean mReceivedCargo = false;
@@ -43,19 +44,28 @@ public class BallIntake extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
     private final TalonSRX mMaster;
+    private final TalonSRX mCarriage;
     private final Solenoid mPopoutSolenoid;
 
     private BallIntake() {
         mPopoutSolenoid = new Solenoid(Ports.CARRIAGE_PCM, Ports.BALL_INTAKE_EXTEND);
 
         mMaster = new TalonSRX(6);
-        
+        mCarriage = new TalonSRX(10);
+        mMaster.configFactoryDefault();
+        mCarriage.configFactoryDefault();
+
         mProxy = new DigitalInput(3);
 
         mMaster.set(ControlMode.PercentOutput, 0);
         mMaster.setInverted(false);
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
+
+        mCarriage.set(ControlMode.PercentOutput, 0);
+        mCarriage.setInverted(false);
+        mCarriage.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
+        mCarriage.enableVoltageCompensation(true);
     }
 
     public synchronized static BallIntake getInstance() {
@@ -119,6 +129,7 @@ public class BallIntake extends Subsystem {
         case INTAKING:
             if (modifyOutputs) {
                 mPeriodicIO.demand = kIntakeVoltage;
+                mPeriodicIO.demand_carriage = kCarriageVoltage;
                 mPeriodicIO.pop_out_solenoid = true;
             }
             if (hasCargo()) {
@@ -127,7 +138,8 @@ public class BallIntake extends Subsystem {
             break;
         case OUTTAKING:
             if (modifyOutputs) {
-                mPeriodicIO.demand = kOuttakeVoltage;
+                mPeriodicIO.demand = 0;
+                mPeriodicIO.demand_carriage = kOuttakeVoltage;
                 mPeriodicIO.pop_out_solenoid = true;
             } else if (hasCargo()) {
                 mState = State.HOLDING;
@@ -135,7 +147,8 @@ public class BallIntake extends Subsystem {
             break;
         case HOLDING:
             if (modifyOutputs) {
-                mPeriodicIO.demand = hasCargo() ? kHoldingVoltage : 0.0;
+                mPeriodicIO.demand = 0;
+                mPeriodicIO.demand_carriage = hasCargo() ? kHoldingVoltage : 0.0;
                 if (hasCargo()) {
                     mPeriodicIO.pop_out_solenoid = false;
                 }
@@ -161,6 +174,10 @@ public class BallIntake extends Subsystem {
 
     public double getVoltage() {
         return mPeriodicIO.demand;
+    }
+
+    public double getCarriageVoltage() {
+        return mPeriodicIO.demand_carriage;
     }
 
     public void setState(WantedAction wanted_state) {
@@ -189,6 +206,8 @@ public class BallIntake extends Subsystem {
     @Override
     public synchronized void writePeriodicOutputs() {
         mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
+        mCarriage.set(ControlMode.PercentOutput, mPeriodicIO.demand_carriage / 12.0);
+
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
     }
 
@@ -203,6 +222,7 @@ public class BallIntake extends Subsystem {
 
         // OUTPUTS
         public double demand;
+        public double demand_carriage;
         public boolean pop_out_solenoid;
     }
 }
