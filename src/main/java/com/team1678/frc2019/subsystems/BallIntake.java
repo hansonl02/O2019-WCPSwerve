@@ -19,6 +19,8 @@ public class BallIntake extends Subsystem {
     public static double kHoldingVoltage = 0;
     public static double kOuttakeVoltage = 10.0;
 
+    private boolean mReceivedCargo = false;
+
     private static BallIntake mInstance;
     
     private DigitalInput mProxy;
@@ -179,6 +181,7 @@ public class BallIntake extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
         mDebouncedCargo = mLastSeenCargo.update(!mProxy.get(), 0.1);
+        mReceivedCargo = mDebouncedCargo != mPeriodicIO.has_cargo;
         mPeriodicIO.has_cargo = mDebouncedCargo;
         mPeriodicIO.cargo_proxy = !mProxy.get();
     }
@@ -187,6 +190,10 @@ public class BallIntake extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
+    }
+
+    public boolean needsToNotifyDrivers() {
+        return mReceivedCargo;
     }
 
     public static class PeriodicIO {
