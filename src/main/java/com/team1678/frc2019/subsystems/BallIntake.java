@@ -1,29 +1,27 @@
 package com.team1678.frc2019.subsystems;
 
 import com.team1678.frc2019.Constants;
-import com.team1678.frc2019.Ports;
 import com.team1678.frc2019.loops.ILooper;
 import com.team1678.frc2019.loops.Loop;
+import com.team1678.frc2019.Ports;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 
-import com.team254.lib.drivers.TalonSRXFactory;
-import com.team254.drivers.LazyTalonSRX;
-import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
-
-import java.util.ArrayList;
 
 public class BallIntake extends Subsystem {
     // Intaking is positive
     public static double kIntakeVoltage = -12.0;
-    public static double kHoldingVoltage = -4.0;
+    public static double kHoldingVoltage = 0;
     public static double kOuttakeVoltage = 10.0;
 
     private static BallIntake mInstance;
+    
+    private DigitalInput mProxy;
 
     public enum WantedAction {
         NONE, INTAKE, OUTTAKE,
@@ -42,23 +40,20 @@ public class BallIntake extends Subsystem {
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
-    private final TalonSRX mIntakeMotor;
-    private final TalonSRX mCarriageMotor;
+    private final TalonSRX mMaster;
     private final Solenoid mPopoutSolenoid;
 
     private BallIntake() {
-        mPopoutSolenoid = new Solenoid(Ports.BALL_INTAKE_EXTEND);
+        mPopoutSolenoid = new Solenoid(Ports.CARRIAGE_PCM, Ports.BALL_INTAKE_EXTEND);
 
-        mIntakeMotor = new LazyTalonSRX(Ports.BALL_INTAKE);
-        mIntakeMotor.configFactoryDefault();
+        mMaster = new TalonSRX(6);
+        
+        mProxy = new DigitalInput(3);
 
-        mCarriageMotor = new LazyTalonSRX(Ports.BALL_CARRIAGE);
-        mCarriageMotor.configFactoryDefault();
-
-        mIntakeMotor.set(ControlMode.PercentOutput, 0);
-        mIntakeMotor.setInverted(false);
-        mIntakeMotor.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
-        mIntakeMotor.enableVoltageCompensation(true);
+        mMaster.set(ControlMode.PercentOutput, 0);
+        mMaster.setInverted(false);
+        mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
+        mMaster.enableVoltageCompensation(true);
     }
 
     public synchronized static BallIntake getInstance() {
@@ -94,7 +89,7 @@ public class BallIntake extends Subsystem {
 
             @Override
             public void onLoop(double timestamp) {
-                synchronized (CargoIntake.this) {
+                synchronized (BallIntake.this) {
                     if (mRunningManual) {
                         runStateMachine(false);
                         return;
@@ -183,33 +178,15 @@ public class BallIntake extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
-        mDebouncedCargo = mLastSeenCargo.update(mCanifier.getCargoProxy(), 0.1);
+        mDebouncedCargo = mLastSeenCargo.update(!mProxy.get(), 0.1);
         mPeriodicIO.has_cargo = mDebouncedCargo;
-        mPeriodicIO.cargo_proxy = mCanifier.getCargoProxy();
+        mPeriodicIO.cargo_proxy = !mProxy.get();
     }
 
     @Override
     public synchronized void writePeriodicOutputs() {
-        mIntakeMotor.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
-        if (Wrist.getInstance().getWantsPassThrough()) {
-            forceIntakeIn();
-        }
+        mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
-    }
-
-    @Override
-    public boolean checkSystem() {
-        return TalonSRXChecker.CheckTalons(this, new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
-            {
-                add(new TalonSRXChecker.TalonSRXConfig("cargo intake", mIntakeMotor));
-            }
-        }, new TalonSRXChecker.CheckerConfig() {
-            {
-                mCurrentFloor = 2;
-                mCurrentEpsilon = 2.0;
-                mRPMSupplier = null;
-            }
-        });
     }
 
     public static class PeriodicIO {
