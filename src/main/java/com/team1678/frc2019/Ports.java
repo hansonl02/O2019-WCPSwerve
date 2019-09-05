@@ -40,9 +40,8 @@ public class Ports {
     public static final int BALL_INTAKE_EXTEND = 3;
     
     //Digital Inputs
-    public static final int BALL_INTAKE_BANNER  = 3;
+    public static final int BALL_INTAKE_PROXY  = 3;
     public static final int DISK_INTAKE_BANNER = 1;
-    public static final int BALL_CARRIAGE_BANNER = 0;
 
     //CANifier
     public static final int CANIFIER = 23;

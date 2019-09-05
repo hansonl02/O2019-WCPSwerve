@@ -14,10 +14,8 @@ import com.team1678.frc2019.loops.LimelightProcessor.Pipeline;
 import com.team1678.frc2019.loops.Looper;
 import com.team1678.frc2019.loops.QuinticPathTransmitter;
 import com.team1678.frc2019.loops.RobotStateEstimator;
-import com.team1678.frc2019.subsystems.BallCarriage;
 import com.team1678.frc2019.subsystems.BallIntake;
 import com.team1678.frc2019.subsystems.DiskIntake;
-import com.team1678.frc2019.subsystems.LEDs;
 import com.team1678.frc2019.subsystems.SubsystemManager;
 import com.team1678.frc2019.subsystems.Superstructure;
 import com.team1678.frc2019.subsystems.Swerve;
@@ -338,7 +336,7 @@ public class Robot extends TimedRobot {
 
 		//s.sendManualInput(-coDriver.getY(Hand.kLeft), -coDriver.getY(Hand.kRight), /*-coDriver.getY(Hand.kLeft)*/0.0);
 
-		////// Official Controls //////
+		/* ////// Official Controls //////
 
 		if(!s.isClimbing()){
 			if (coDriver.startButton.shortReleased()) {
@@ -435,9 +433,9 @@ public class Robot extends TimedRobot {
 			}
 		}else{
 			
-		}
+		} */
 
-		if (diskIntake.needsToNotifyDivers() || ballCarriage.needsToNotifyDrivers() || swerve.needsToNotifyDrivers()) {
+		if (diskIntake.needsToNotifyDivers() || ballIntake.needsToNotifyDrivers() || swerve.needsToNotifyDrivers()) {
 			driver.rumble(1.0, 2.0);
 			coDriver.rumble(1.0, 2.0);
 		}
