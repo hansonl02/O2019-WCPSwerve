@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 
+import com.team254.drivers.LazyTalonSRX;
 import com.team254.lib.util.TimeDelayedBoolean;
 
 public class BallIntake extends Subsystem {
@@ -43,15 +44,15 @@ public class BallIntake extends Subsystem {
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
-    private final TalonSRX mMaster;
-    private final TalonSRX mCarriage;
+    private final LazyTalonSRX mMaster;
+    private final LazyTalonSRX mCarriage;
     private final Solenoid mPopoutSolenoid;
 
     private BallIntake() {
         mPopoutSolenoid = new Solenoid(Ports.CARRIAGE_PCM, Ports.BALL_INTAKE_EXTEND);
 
-        mMaster = new TalonSRX(6);
-        mCarriage = new TalonSRX(10);
+        mMaster = new LazyTalonSRX(6);
+        mCarriage = new LazyTalonSRX(10);
         mMaster.configFactoryDefault();
         mCarriage.configFactoryDefault();
 
@@ -193,6 +194,14 @@ public class BallIntake extends Subsystem {
             mState = State.OUTTAKING;
             break;
         }
+    }
+
+    public LazyTalonSRX getTalon() {
+        return mMaster;
+    }
+
+    public LazyTalonSRX getCarriageTalon() {
+        return mCarriage;
     }
 
     @Override
