@@ -1,6 +1,6 @@
-package com.frc1678.c2019.controlboard;
+package com.team1678.frc2019.controlboard;
 
-import com.frc1678.c2019.Constants;
+import com.team1678.frc2019.Constants;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class MainDriveControlBoard implements IDriveControlBoard {

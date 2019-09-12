@@ -1,4 +1,4 @@
-package com.frc1678.c2019.controlboard;
+package com.team1678.frc2019.controlboard;
 
 public interface IDriveControlBoard {
     double getThrottle();

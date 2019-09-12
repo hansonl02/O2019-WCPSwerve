@@ -13,7 +13,6 @@ import com.team1678.frc2019.loops.Loop;
 import com.team1678.frc2019.subsystems.Swerve.VisionState;
 import com.team1678.frc2019.subsystems.requests.Request;
 import com.team1678.frc2019.subsystems.requests.RequestList;
-import com.team1323.lib.util.InterpolatingDouble;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 

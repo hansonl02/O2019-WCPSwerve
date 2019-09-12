@@ -1,4 +1,4 @@
-pacage com.team1678.frc2019;
+package com.team1678.frc2019;
 
 import java.util.Arrays;
 import java.util.List;
@@ -174,4 +174,12 @@ public class Constants {
 	public static final List<List<Double>> rainbow = Arrays.asList(red, orange, yellow, green, blue, pink, purple);
 
 	public static final int kLongCANTimeoutMs = 100;
+
+	//Gamepad Ports
+	public static final boolean kUseDriveGamepad = false;
+    public static final int kDriveGamepadPort = 0;
+    public static final int kButtonGamepadPort = 2;
+    public static final int kMainThrottleJoystickPort = 0;
+    public static final int kMainTurnJoystickPort = 1;
+    public static final double kJoystickThreshold = 0.2;
 }
