@@ -210,6 +210,17 @@ public class Robot extends TimedRobot {
 				twoControllerMode();
 
 			allPeriodic();
+
+			
+
+			if (mControlBoard.getRunIntake()) {
+                mCargoIntake.setState(WantedAction.State.INTAKING);
+            } else if (mControlBoard.getRunOuttake()) {
+                mCargoIntake.setState(WantedAction.State.OUTTAKING);
+            } else {
+                mCargoIntake.setState(WantedAction.State.HOLDING);
+            }
+
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
