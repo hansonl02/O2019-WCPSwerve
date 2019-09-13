@@ -211,7 +211,7 @@ public class DiskIntake extends Subsystem {
     hasDisk = false;
   }
 
-  public void conformToState(State desiredState) {
+  private void conformToState(State desiredState) {
     conformToState(desiredState, desiredState.pumpPower);
   }
 

@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
 		swerve.set10VoltRotationMode(false);
 
 		if(diskIntake.hasDisk())
-			diskIntake.conformToState(DiskIntake.State.HOLDING);
+			diskIntake.stateRequest(DiskIntake.State.HOLDING);
 	}
 
 	@Override
@@ -212,7 +212,7 @@ public class Robot extends TimedRobot {
 				twoControllerMode();
 
 			allPeriodic();
-			
+
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
