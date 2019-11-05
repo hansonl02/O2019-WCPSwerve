@@ -18,6 +18,8 @@ import com.team1678.frc2019.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonSRX;
 import com.team1678.frc2019.Constants;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  **/
 public class DiskIntake extends Subsystem {
   private static DiskIntake instance = null;
+  private PowerDistributionPanel pdp;
   public static DiskIntake getInstance() {
     if(instance == null) 
       instance = new DiskIntake();
@@ -54,12 +57,16 @@ public class DiskIntake extends Subsystem {
     extend = new Solenoid(Ports.DRIVEBASE_PCM, Ports.DISK_INTAKE_EXTEND);
     release = new Solenoid(Ports.DRIVEBASE_PCM, Ports.DISK_INTAKE_RELEASE);
 
+    pdp = new PowerDistributionPanel();
+    pumpMotor.configFactoryDefault();
+
     pumpMotor.setInverted(false);
 
     pumpMotor.setNeutralMode(NeutralMode.Brake);
 
     pumpMotor.configVoltageCompSaturation(12.0, 10);
     pumpMotor.enableVoltageCompensation(true);
+
   }
 
   private void configureTalon(){
@@ -88,7 +95,8 @@ public class DiskIntake extends Subsystem {
     OFF(0, false, false), 
     INTAKING(Constants.kPumpBuildOutput, true, false),
     BUILDING_PRESSURE(Constants.kPumpBuildOutput, false, false),
-    HOLDING(0, false, false),
+    HOLDING(Constants.kPumpBuildOutput, false, false),
+    PREPPING_SCORE(Constants.kPumpBuildOutput, true, false),
     SCORING(0, true, true);
 
     public double pumpPower = 0;
@@ -138,7 +146,7 @@ public class DiskIntake extends Subsystem {
   }
 
   public void fireRelease(boolean fire) {
-    release.set(!fire);
+    release.set(fire);
   }
 
   private void setPump(double power) {
@@ -160,22 +168,8 @@ public class DiskIntake extends Subsystem {
 
       switch (currentState) {
         case OFF:
-          
-          break;
-        case INTAKING:
-          if(stateChanged)
-            hasDisk = false;
-          if(pumpMotor.getOutputCurrent() >= 10.0 && (timestamp - stateEnteredTimestamp) >= 0.5) {
-            if(Double.isInfinite(currentSpikeTimestamp)) {
-              currentSpikeTimestamp = timestamp;
-            } else {
-              if(timestamp - currentSpikeTimestamp > 0.375) {
-                hasDisk = true;
-                needsToNotifyDrivers = true;
-              }
-            }
-          } else if (!Double.isInfinite(currentSpikeTimestamp)) {
-            currentSpikeTimestamp = Double.POSITIVE_INFINITY;
+          if (hasDisk()) {
+            conformToState(State.HOLDING);
           }
           break;
         case SCORING:
@@ -194,7 +188,6 @@ public class DiskIntake extends Subsystem {
 
       if(stateChanged)
         stateChanged = false;
-
     }
 
     @Override
@@ -282,6 +275,8 @@ public class DiskIntake extends Subsystem {
   @Override
   public void outputTelemetry() {
     SmartDashboard.putString("Disk intake state", currentState.toString());
+    SmartDashboard.putNumber("Disk Intake Pump Current", pumpMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Disk Intake Pump Current Talon", pdp.getCurrent(3));
     if(Constants.kDebuggingOutput) {
       SmartDashboard.putNumber("Disk Intake Pump Current", pumpMotor.getOutputCurrent());
       SmartDashboard.putNumber("Disk Intake Pump Voltage", pumpMotor.getMotorOutputVoltage());

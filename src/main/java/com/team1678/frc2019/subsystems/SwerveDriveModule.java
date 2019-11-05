@@ -2,6 +2,8 @@ package com.team1678.frc2019.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
@@ -104,6 +106,8 @@ public class SwerveDriveModule extends Subsystem{
     	rotationMotor.config_kD(1, 200.0, 10);
     	rotationMotor.config_kF(1, 1023.0/Constants.kSwerveRotation10VoltMaxSpeed, 10);
 		rotationMotor.set(ControlMode.MotionMagic, rotationMotor.getSelectedSensorPosition(0));
+		rotationMotor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+		rotationMotor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
 		if(!isRotationSensorConnected()){
 			DriverStation.reportError(name + "rotation encoder not detected!", false);
 			hasEmergency = true;
@@ -137,6 +141,8 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.config_kI(1, 0.0, 10);
     	driveMotor.config_kD(1, 0.0, 10);
     	driveMotor.config_kF(1, 1023.0/Constants.kSwerveDriveMaxSpeed*0.9, 10);
+		driveMotor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+		driveMotor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
 		if(!isDriveSensorConnected()){
 			DriverStation.reportError(name + "drive encoder not detected!", false);
 			hasEmergency = true;

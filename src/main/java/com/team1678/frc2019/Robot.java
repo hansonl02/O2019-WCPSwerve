@@ -16,9 +16,11 @@ import com.team1678.frc2019.loops.QuinticPathTransmitter;
 import com.team1678.frc2019.loops.RobotStateEstimator;
 import com.team1678.frc2019.subsystems.BallIntake;
 import com.team1678.frc2019.subsystems.DiskIntake;
+import com.team1678.frc2019.subsystems.LEDs;
 import com.team1678.frc2019.subsystems.SubsystemManager;
 import com.team1678.frc2019.subsystems.Superstructure;
 import com.team1678.frc2019.subsystems.Swerve;
+import com.team1678.frc2019.subsystems.BallIntake.WantedAction;
 import com.team1323.io.SwitchController;
 import com.team1323.io.Xbox;
 import com.team1323.lib.util.CrashTracker;
@@ -45,6 +47,7 @@ public class Robot extends TimedRobot {
 	private Swerve swerve;
 	private BallIntake ballIntake;
 	private DiskIntake diskIntake;
+	private LEDs leds;
 	private Superstructure s;
 	private SubsystemManager subsystems;
 
@@ -76,8 +79,9 @@ public class Robot extends TimedRobot {
 		swerve = Swerve.getInstance();
 		ballIntake = BallIntake.getInstance();
 		diskIntake = DiskIntake.getInstance();
+		leds = LEDs.getInstance();
 		subsystems = new SubsystemManager(
-				Arrays.asList(swerve, ballIntake, diskIntake, diskIntake, s));
+				Arrays.asList(swerve, ballIntake, diskIntake, diskIntake, leds, s));
 
 		limelight = LimelightProcessor.getInstance();
 		
@@ -185,6 +189,7 @@ public class Robot extends TimedRobot {
 			teleopConfig();
 			SmartDashboard.putBoolean("Auto", false);
 			robotState.enableXTarget(false);
+			leds.conformToState(LEDs.State.ENABLED);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -209,6 +214,20 @@ public class Robot extends TimedRobot {
 			else
 				twoControllerMode();
 
+			if(subsystems.haveEmergency()){
+				leds.conformToState(LEDs.State.EMERGENCY);
+			} else if (swerve.getState() == Swerve.ControlState.VISION){
+				leds.conformToState(LEDs.State.TARGET_TRACKING);
+			} else if(robotState.seesTarget()) {
+				leds.conformToState(LEDs.State.TARGET_VISIBLE);
+			} else if (ballIntake.hasCargo()) {
+				leds.conformToState(LEDs.State.BALL_IN_INTAKE);
+			} else if (diskIntake.hasDisk()) {
+				leds.conformToState(LEDs.State.DISK_IN_INTAKE);
+			} else {
+				leds.conformToState(LEDs.State.ENABLED);
+			}
+
 			allPeriodic();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -222,6 +241,7 @@ public class Robot extends TimedRobot {
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
+			leds.conformToState(LEDs.State.RAINBOW);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -232,6 +252,8 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {
 		try {
 			allPeriodic();
+			if(subsystems.haveEmergency())
+				leds.conformToState(LEDs.State.EMERGENCY);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -301,7 +323,9 @@ public class Robot extends TimedRobot {
 			}
 		}
 		
-		if (driver.bButton.isBeingPressed())
+		if (driver.yButton.isBeingPressed())
+			swerve.rotate(0);
+		else if (driver.bButton.isBeingPressed())
 			swerve.rotate(90);
 		else if (driver.aButton.isBeingPressed())
 			swerve.rotate(180);
@@ -322,13 +346,36 @@ public class Robot extends TimedRobot {
 			swerve.temporarilyDisableHeadingController();
 			swerve.zeroSensors(Constants.kRobotLeftStartingPose);
 			swerve.resetAveragedDirection();
-		} else if (driver.startButton.shortReleased()) {
-			if(!swerve.isTracking()){
-				//diskIntake.loseDisk();
-				limelight.setPipeline(Pipeline.CLOSEST);
-				s.humanLoaderTrackingState();
-			}
-		} /*else if (driver.leftBumper.isBeingPressed()) {
+		}
+		
+		BallIntake.WantedAction ball_intake = BallIntake.WantedAction.NONE;
+		
+		if (coDriver.rightTrigger.isBeingPressed() && coDriver.rightBumper.isBeingPressed()) {
+			ball_intake = BallIntake.WantedAction.INTAKE;
+		} else if (coDriver.rightBumper.isBeingPressed()) {
+			ball_intake = BallIntake.WantedAction.BELT_INTAKE;
+		}
+
+		if (coDriver.leftTrigger.isBeingPressed()) {
+			ball_intake = BallIntake.WantedAction.OUTTAKE;
+		}
+
+		ballIntake.setState(ball_intake);
+
+		if (coDriver.bButton.isBeingPressed()) {
+			diskIntake.conformToState(DiskIntake.State.HOLDING);
+		} else if (coDriver.aButton.isBeingPressed()) {
+			diskIntake.conformToState(DiskIntake.State.INTAKING);
+		} else if (coDriver.xButton.isBeingPressed()) {
+			diskIntake.conformToState(DiskIntake.State.PREPPING_SCORE);
+		} else if (coDriver.yButton.isBeingPressed()) {
+			diskIntake.conformToState(DiskIntake.State.SCORING);
+		} else if (coDriver.leftBumper.isBeingPressed()) {
+			diskIntake.stop();
+		}
+
+
+		/*else if (driver.leftBumper.isBeingPressed()) {
 			swerve.setVelocity(new Rotation2d(), 24.0);
 		} else if (swerve.getState() == Swerve.ControlState.VELOCITY) {
 			swerve.setState(Swerve.ControlState.MANUAL);

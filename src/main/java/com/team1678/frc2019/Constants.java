@@ -22,8 +22,8 @@ public class Constants {
 	public static final boolean kDebuggingOutput = false;
 	
 	//Physical Robot Dimensions (including bumpers)
-	public static final double kRobotWidth = 36.5;
-	public static final double kRobotLength = 36.5;
+	public static final double kRobotWidth = 17.5;
+	public static final double kRobotLength = 17.5;
 	public static final double kRobotHalfWidth = kRobotWidth / 2.0;
 	public static final double kRobotHalfLength = kRobotLength / 2.0;
 	public static final double kRobotProbeExtrusion = 4.0;
@@ -103,10 +103,10 @@ public class Constants {
     public static final double kSwerveRotationSpeedScalar = ((1.0 / 0.125) - 1.0) / kSwerveMaxSpeedInchesPerSecond;
     
     //Swerve Module Wheel Offsets (Rotation encoder values when the wheels are facing 0 degrees)
-	public static final int kFrontRightEncoderStartingPos = kIsUsingCompBot ? -1403 - 1024 : 1740 - 1024;
-	public static final int kFrontLeftEncoderStartingPos = kIsUsingCompBot ? -2171 - 1024 : -2895 - 1024;
-	public static final int kRearLeftEncoderStartingPos = kIsUsingCompBot ? -1327 - 1024 : -2639 - 1024;
-	public static final int kRearRightEncoderStartingPos = kIsUsingCompBot ? -5953 - 1024 : 975 - 1024;
+	public static final int kFrontRightEncoderStartingPos = -262;
+	public static final int kFrontLeftEncoderStartingPos = -2213;
+	public static final int kRearLeftEncoderStartingPos = -3906;
+	public static final int kRearRightEncoderStartingPos = -2398;
 	
 	//Swerve Module Positions (relative to the center of the drive base)
 	public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength/2, kWheelbaseWidth/2);
