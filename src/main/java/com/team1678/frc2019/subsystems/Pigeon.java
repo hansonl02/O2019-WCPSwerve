@@ -34,7 +34,7 @@ public class Pigeon {
 		pigeon.getYawPitchRoll(ypr);
 		PigeonIMU.FusionStatus fusionStatus = new PigeonIMU.FusionStatus();
 		SmartDashboard.putNumber("Pigeon Heading", -pigeon.getFusedHeading(fusionStatus));
-		return Rotation2d.fromDegrees(-pigeon.getFusedHeading(fusionStatus)/*-ypr[0]*/);
+		return Rotation2d.fromDegrees(pigeon.getFusedHeading(fusionStatus)/*-ypr[0]*/);
 	}
 
 	public double getPitch(){

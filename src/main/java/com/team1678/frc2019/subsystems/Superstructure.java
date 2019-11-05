@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.team1678.frc2019.Constants;
+import com.team1678.frc2019.Ports;
 import com.team1678.frc2019.RobotState;
 import com.team1678.frc2019.loops.ILooper;
 import com.team1678.frc2019.loops.LimelightProcessor;
@@ -13,6 +14,7 @@ import com.team1678.frc2019.loops.Loop;
 import com.team1678.frc2019.subsystems.Swerve.VisionState;
 import com.team1678.frc2019.subsystems.requests.Request;
 import com.team1678.frc2019.subsystems.requests.RequestList;
+import com.team1678.frc2019.subsystems.requests.EmptyRequest;
 import com.team1323.lib.util.InterpolatingDouble;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -49,7 +51,7 @@ public class Superstructure extends Subsystem {
 
 		diskIntake = DiskIntake.getInstance();
 		
-		compressor = new Compressor(20);
+		compressor = new Compressor(Ports.DRIVEBASE_PCM);
 		
 		swerve = Swerve.getInstance();
 
@@ -66,9 +68,9 @@ public class Superstructure extends Subsystem {
 		return instance;
 	}
 	
-	private RequestList activeRequests;
+	private RequestList activeRequests = new RequestList();
 	private ArrayList<RequestList> queuedRequests;
-	private Request currentRequest;
+	private Request currentRequest = new EmptyRequest();
 	
 	private boolean newRequests = false;
 	private boolean activeRequestsCompleted = false;

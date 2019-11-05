@@ -16,10 +16,10 @@ import com.team254.lib.util.TimeDelayedBoolean;
 
 public class BallIntake extends Subsystem {
     // Intaking is positive
-    public static double kIntakeVoltage = -12.0;
+    public static double kIntakeVoltage = 12.0;
     public static double kHoldingVoltage = 0;
-    public static double kCarriageVoltage = 6.0;
-    public static double kOuttakeVoltage = 10.0;
+    public static double kCarriageVoltage = -12.0;
+    public static double kOuttakeVoltage = -12.0;
 
     private boolean mReceivedCargo = false;
 
@@ -28,11 +28,11 @@ public class BallIntake extends Subsystem {
     private DigitalInput mProxy;
 
     public enum WantedAction {
-        NONE, INTAKE, OUTTAKE,
+        NONE, INTAKE, BELT_INTAKE, OUTTAKE,
     }
 
     private enum State {
-        INTAKING, OUTTAKING, HOLDING,
+        INTAKING, BELT_ONLY, OUTTAKING, HOLDING,
     }
 
     private State mState = State.HOLDING;
@@ -49,14 +49,14 @@ public class BallIntake extends Subsystem {
     private final Solenoid mPopoutSolenoid;
 
     private BallIntake() {
-        mPopoutSolenoid = new Solenoid(Ports.CARRIAGE_PCM, Ports.BALL_INTAKE_EXTEND);
+        mPopoutSolenoid = new Solenoid(Ports.DRIVEBASE_PCM, Ports.BALL_INTAKE_EXTEND);
 
-        mMaster = new LazyTalonSRX(6);
-        mCarriage = new LazyTalonSRX(10);
+        mMaster = new LazyTalonSRX(Ports.BALL_INTAKE);
+        mCarriage = new LazyTalonSRX(Ports.BALL_CARRIAGE);
         mMaster.configFactoryDefault();
         mCarriage.configFactoryDefault();
 
-        mProxy = new DigitalInput(3);
+        mProxy = new DigitalInput(Ports.BALL_INTAKE_PROXY);
 
         mMaster.set(ControlMode.PercentOutput, 0);
         mMaster.setInverted(false);
@@ -128,30 +128,56 @@ public class BallIntake extends Subsystem {
     public void runStateMachine(boolean modifyOutputs) {
         switch (mState) {
         case INTAKING:
+            if (mProxy.get()) {
+                System.out.println("HOLDING");
+                mState = State.HOLDING;
+                mPeriodicIO.demand_carriage = 2.0;
+                DiskIntake.getInstance().fireExtend(false);
+                break;
+            } else {
+                DiskIntake.getInstance().fireExtend(true);
+            }
             if (modifyOutputs) {
                 mPeriodicIO.demand = kIntakeVoltage;
-                mPeriodicIO.demand_carriage = kCarriageVoltage;
+                mPeriodicIO.demand_carriage = -6.0;
                 mPeriodicIO.pop_out_solenoid = true;
             }
-            if (hasCargo()) {
+
+            break;
+        case BELT_ONLY:
+            if (mProxy.get()) {
+                System.out.println("HOLDING");
                 mState = State.HOLDING;
+                mPeriodicIO.demand_carriage = 2.0;
+                DiskIntake.getInstance().fireExtend(false);
+                break;
+            } else {
+                DiskIntake.getInstance().fireExtend(true);
             }
+            if (modifyOutputs) {
+                mPeriodicIO.demand = 0;
+                mPeriodicIO.demand_carriage = -6.0;
+                mPeriodicIO.pop_out_solenoid = false;
+            }
+
             break;
         case OUTTAKING:
             if (modifyOutputs) {
                 mPeriodicIO.demand = 0;
                 mPeriodicIO.demand_carriage = kOuttakeVoltage;
-                mPeriodicIO.pop_out_solenoid = true;
-            } else if (hasCargo()) {
-                mState = State.HOLDING;
+                mPeriodicIO.pop_out_solenoid = false;
             }
+            DiskIntake.getInstance().fireExtend(false);
             break;
         case HOLDING:
             if (modifyOutputs) {
                 mPeriodicIO.demand = 0;
-                mPeriodicIO.demand_carriage = hasCargo() ? kHoldingVoltage : 0.0;
+                mPeriodicIO.pop_out_solenoid = false;
                 if (hasCargo()) {
-                    mPeriodicIO.pop_out_solenoid = false;
+                    mPeriodicIO.demand_carriage = 1.0;
+                    DiskIntake.getInstance().fireExtend(false);
+                } else {
+                    mPeriodicIO.demand_carriage = 0.0;
                 }
             }
             break;
@@ -190,6 +216,9 @@ public class BallIntake extends Subsystem {
         case INTAKE:
             mState = State.INTAKING;
             break;
+        case BELT_INTAKE:
+            mState = State.BELT_ONLY;
+            break;
         case OUTTAKE:
             mState = State.OUTTAKING;
             break;
@@ -206,10 +235,10 @@ public class BallIntake extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
-        mDebouncedCargo = mLastSeenCargo.update(!mProxy.get(), 0.1);
-        mReceivedCargo = mDebouncedCargo != mPeriodicIO.has_cargo;
+        mDebouncedCargo = mProxy.get();
+        mReceivedCargo = mProxy.get() != mPeriodicIO.has_cargo;
         mPeriodicIO.has_cargo = mDebouncedCargo;
-        mPeriodicIO.cargo_proxy = !mProxy.get();
+        mPeriodicIO.cargo_proxy = mProxy.get();
     }
 
     @Override

@@ -181,7 +181,7 @@ public class Swerve extends Subsystem{
 		frontLeft.invertDriveMotor(false);
 		
 		modules.forEach((m) -> m.reverseRotationSensor(true));
-				
+
 		pigeon = Pigeon.getInstance();
 		
 		pose = new Pose2d();
