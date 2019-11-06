@@ -333,11 +333,11 @@ public class Robot extends TimedRobot {
 			swerve.rotate(270);
 		else if (driver.leftBumper.shortReleased())
 			swerve.rotate(-24);
-		else if(driver.leftBumper.longPressed())
+		else if(driver.leftTrigger.isBeingPressed())
 			swerve.rotate(-151.0);
 		else if (driver.rightBumper.shortReleased())
 			swerve.rotate(24);
-		else if(driver.rightBumper.longPressed())
+		else if(driver.rightTrigger.isBeingPressed())
 			swerve.rotate(151.0);
 		else if(driver.POV0.isBeingPressed())
 			swerve.rotate(0.0);
