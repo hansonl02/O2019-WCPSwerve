@@ -333,11 +333,11 @@ public class Robot extends TimedRobot {
 			swerve.rotate(270);
 		else if (driver.leftBumper.shortReleased())
 			swerve.rotate(-24);
-		else if(driver.leftBumper.longPressed())
+		else if(driver.leftTrigger.isBeingPressed())
 			swerve.rotate(-151.0);
 		else if (driver.rightBumper.shortReleased())
 			swerve.rotate(24);
-		else if(driver.rightBumper.longPressed())
+		else if(driver.rightTrigger.isBeingPressed())
 			swerve.rotate(151.0);
 		else if(driver.POV0.isBeingPressed())
 			swerve.rotate(0.0);
@@ -354,6 +354,10 @@ public class Robot extends TimedRobot {
 			ball_intake = BallIntake.WantedAction.INTAKE;
 		} else if (coDriver.rightBumper.isBeingPressed()) {
 			ball_intake = BallIntake.WantedAction.BELT_INTAKE;
+		}
+
+		if (coDriver.startButton.isBeingPressed()) {
+			ball_intake = BallIntake.WantedAction.MANUAL_SUCC;
 		}
 
 		if (coDriver.leftTrigger.isBeingPressed()) {
