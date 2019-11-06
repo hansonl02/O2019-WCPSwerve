@@ -356,10 +356,6 @@ public class Robot extends TimedRobot {
 			ball_intake = BallIntake.WantedAction.BELT_INTAKE;
 		}
 
-		if (coDriver.startButton.isBeingPressed()) {
-			ball_intake = BallIntake.WantedAction.MANUAL_SUCC;
-		}
-
 		if (coDriver.leftTrigger.isBeingPressed()) {
 			ball_intake = BallIntake.WantedAction.OUTTAKE;
 		}
