@@ -28,11 +28,11 @@ public class BallIntake extends Subsystem {
     private DigitalInput mProxy;
 
     public enum WantedAction {
-        NONE, INTAKE, BELT_INTAKE, OUTTAKE
+        NONE, INTAKE, BELT_INTAKE, OUTTAKE,
     }
 
     private enum State {
-        INTAKING, BELT_ONLY, OUTTAKING, HOLDING
+        INTAKING, BELT_ONLY, OUTTAKING, HOLDING,
     }
 
     private State mState = State.HOLDING;
