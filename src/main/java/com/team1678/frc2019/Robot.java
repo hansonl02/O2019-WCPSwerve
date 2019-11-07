@@ -220,8 +220,12 @@ public class Robot extends TimedRobot {
 				leds.conformToState(LEDs.State.TARGET_TRACKING);
 			} else if(robotState.seesTarget()) {
 				leds.conformToState(LEDs.State.TARGET_VISIBLE);
+			} else if (ballIntake.isIntaking()) {
+				leds.conformToState(LEDs.State.BALL_INTAKING);
 			} else if (ballIntake.hasCargo()) {
 				leds.conformToState(LEDs.State.BALL_IN_INTAKE);
+			} else if (diskIntake.isIntaking()) {
+				leds.conformToState(LEDs.State.DISK_INTAKING);
 			} else if (diskIntake.hasDisk()) {
 				leds.conformToState(LEDs.State.DISK_IN_INTAKE);
 			} else {

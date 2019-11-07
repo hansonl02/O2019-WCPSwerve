@@ -145,6 +145,10 @@ public class DiskIntake extends Subsystem {
     return currentState.extended;
   }
 
+  public boolean isIntaking() {
+    return getState() == State.INTAKING;
+  }
+
   public void fireRelease(boolean fire) {
     release.set(fire);
   }
