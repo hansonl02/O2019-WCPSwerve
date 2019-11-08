@@ -190,12 +190,16 @@ public class BallIntake extends Subsystem {
         mPeriodicIO.pop_out_solenoid = false;
     }
 
+    public State getState() {
+        return mState;
+    }
+
     public boolean hasCargo() {
         return mDebouncedCargo;
     }
 
     public boolean isIntaking() {
-        return mState == State.INTAKING;
+        return getState() == State.INTAKING;
     }
 
     public synchronized void setOpenLoop(double percentage) {
