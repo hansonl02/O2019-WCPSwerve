@@ -162,7 +162,7 @@ public class Superstructure extends Subsystem {
 		@Override
 		public void onLoop(double timestamp) {
 			synchronized(Superstructure.this){
-				final boolean inRange = diskIntake.getState() != DiskIntake.State.OFF;
+				final boolean inRange = true;
 				limelight.enableUpdates(inRange);
 				if(!inRange)
 					robotState.clearVisionTargets();
@@ -304,9 +304,7 @@ public class Superstructure extends Subsystem {
 	public void diskTrackingState(){
 		RequestList state = new RequestList(Arrays.asList(
 			waitForVisionRequest(),
-			swerve.startTrackRequest(Constants.kDiskTargetHeight, new Translation2d(-1.0, 0.0), true, VisionState.LINEAR),
-			diskIntake.stateRequest(DiskIntake.State.HOLDING),
-			swerve.waitForTrackRequest()), false);
+			swerve.startTrackRequest(Constants.kDiskTargetHeight, new Translation2d(-14.0, 0.0), true, VisionState.LINEAR)), false);
 		RequestList queue = new RequestList(Arrays.asList(
 			swerve.strictWaitForTrackRequest()), false);
 		request(state, queue); 
@@ -314,19 +312,10 @@ public class Superstructure extends Subsystem {
 
 	public void humanLoaderTrackingState(){
 		RequestList state = new RequestList(Arrays.asList(
-			diskIntake.stateRequest(DiskIntake.State.INTAKING),
 			waitForVisionRequest(),
-			swerve.trackRequest(Constants.kDiskTargetHeight, new Translation2d(/*7.0*/4.0, 0.0), false, Rotation2d.fromDegrees(180.0), 48.0, 54.0)), false);
-
-		List<RequestList> queue = Arrays.asList(
-			new RequestList(Arrays.asList(
-				diskIntake.stateRequest(DiskIntake.State.INTAKING),
-				diskIntake.waitForDiskRequest()), true),
-			new RequestList(Arrays.asList(
-				//swerve.waitForTrackRequest(),
-				diskIntake.stateRequest(DiskIntake.State.HOLDING)), false)
-		);
-		request(state); 
-		replaceQueue(queue);
+			swerve.trackRequest(Constants.kDiskTargetHeight, new Translation2d(-14.0, 0.0), true, Rotation2d.fromDegrees(180.0), 48.0, 54.0)), false);
+		RequestList queue = new RequestList(Arrays.asList(
+			swerve.strictWaitForTrackRequest()), false);
+		request(state, queue); 
 	}
 }

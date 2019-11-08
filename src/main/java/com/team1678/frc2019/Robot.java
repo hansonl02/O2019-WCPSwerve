@@ -374,6 +374,14 @@ public class Robot extends TimedRobot {
 			diskIntake.stop();
 		}
 
+		if (driver.leftCenterClick.shortReleased()) {
+			s.humanLoaderTrackingState();
+		}
+
+		if (driver.startButton.shortReleased()) {
+			s.diskTrackingState();
+		}
+
 
 		/*else if (driver.leftBumper.isBeingPressed()) {
 			swerve.setVelocity(new Rotation2d(), 24.0);
