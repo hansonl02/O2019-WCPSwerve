@@ -19,7 +19,7 @@ public class Constants {
 	public static final boolean kIsUsingCompBot = true;
 	public static final boolean kIsUsingTractionWheels = true;
 
-	public static final boolean kDebuggingOutput = false;
+	public static final boolean kDebuggingOutput = true;
 	
 	//Physical Robot Dimensions (including bumpers)
 	public static final double kRobotWidth = 17.5;
@@ -63,11 +63,11 @@ public class Constants {
     public static final double kSwerveDiagonal = Math.hypot(kWheelbaseLength, kWheelbaseWidth);
     
     //Camera Constants
-    public static final double kCameraYOffset = 0.25;//0.25
-    public static final double kCameraXOffset = kRobotHalfLength - 15.0;
-    public static final double kCameraZOffset = 16.45;
+    public static final double kCameraYOffset = 0.0;//0.25
+    public static final double kCameraXOffset = kRobotHalfLength;
+    public static final double kCameraZOffset = 46.3;
     public static final double kCameraYawAngleDegrees = 0.0;//-12.7
-    public static final double kCameraPitchAngleDegrees = kIsUsingCompBot ? 14.65 : 14.95;//13.45
+    public static final double kCameraPitchAngleDegrees = -33.3;//13.45
     
     //Goal tracker constants
     public static double kMaxGoalTrackAge = 0.5;//0.5

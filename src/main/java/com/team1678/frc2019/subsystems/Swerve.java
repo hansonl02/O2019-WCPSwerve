@@ -291,7 +291,7 @@ public class Swerve extends Subsystem{
 
 		if(translationalInput.norm() != 0){
 			if(currentState == ControlState.VISION){
-				if(Math.abs(translationalInput.direction().distance(visionTargetHeading)) > Math.toRadians(150.0)){
+				if(translationalInput.norm() > 0.6){
 					setState(ControlState.MANUAL);
 				}
 			}else if(currentState != ControlState.MANUAL){
@@ -1127,7 +1127,7 @@ public class Swerve extends Subsystem{
 
 			@Override
 			public boolean isFinished(){
-				return getState() == ControlState.VISION && motionPlanner.isDone();
+				return motionPlanner.isDone();
 			}
 
 		};
@@ -1269,6 +1269,7 @@ public class Swerve extends Subsystem{
 			SmartDashboard.putString("Swerve State", currentState.toString());
 			SmartDashboard.putBoolean("Vision Updates Allowed", visionUpdatesAllowed);
 			SmartDashboard.putNumberArray("Pigeon YPR", pigeon.getYPR());
+			SmartDashboard.putBoolean("Motion Planner DOne", motionPlanner.isDone());
 		}
 	}
 }
